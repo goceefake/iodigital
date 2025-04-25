@@ -6,7 +6,6 @@ import com.tedtalks.assignment.dto.InfluentialSpeakerDto;
 import com.tedtalks.assignment.dto.InfluentialSpeakerPerYearDto;
 import com.tedtalks.assignment.dto.TedTalkDto;
 import com.tedtalks.assignment.service.TedTalkService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -80,7 +79,7 @@ class TedTalkControllerTest {
         when(tedTalkService.retrieveSpeechByAuthor(eq(authorName), any(Pageable.class)))
                 .thenReturn(page);
 
-        mockMvc.perform(get("/api/v1/ted-talks/retrieve/{authorName}/speech", authorName)
+        mockMvc.perform(get("/api/v1/ted-talks/authors/{authorName}", authorName)
                         .param("page", "0")
                         .param("size", "20")
                         .accept(MediaType.APPLICATION_JSON))
@@ -97,7 +96,7 @@ class TedTalkControllerTest {
         when(tedTalkService.retrieveSpeechByAuthor(eq(authorName), any(Pageable.class)))
                 .thenReturn(emptyPage);
 
-        mockMvc.perform(get("/api/v1/ted-talks/retrieve/{authorName}/speech", authorName)
+        mockMvc.perform(get("/api/v1/ted-talks/authors/{authorName}", authorName)
                         .param("page", "0")
                         .param("size", "20")
                         .accept(MediaType.APPLICATION_JSON))
@@ -116,7 +115,7 @@ class TedTalkControllerTest {
         when(tedTalkService.findInfluentialSpeakers(any(Pageable.class)))
                 .thenReturn(page);
 
-        mockMvc.perform(get("/api/v1/ted-talks/influential-speakers")
+        mockMvc.perform(get("/api/v1/ted-talks/speakers/influential")
                         .param("page", "0")
                         .param("size", "20")
                         .accept(MediaType.APPLICATION_JSON))
@@ -137,7 +136,7 @@ class TedTalkControllerTest {
         when(tedTalkService.findInfluentialSpeakers(any(Pageable.class)))
                 .thenReturn(emptyPage);
 
-        mockMvc.perform(get("/api/v1/ted-talks/influential-speakers")
+        mockMvc.perform(get("/api/v1/ted-talks/speakers/influential")
                         .param("page", "0")
                         .param("size", "20")
                         .accept(MediaType.APPLICATION_JSON))
@@ -156,7 +155,7 @@ class TedTalkControllerTest {
         when(tedTalkService.findMostInfluentialTalksPerYear())
                 .thenReturn(talks);
 
-        mockMvc.perform(get("/api/v1/ted-talks/influential-talks-per-year")
+        mockMvc.perform(get("/api/v1/ted-talks/talks/influential/yearly")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
@@ -174,7 +173,7 @@ class TedTalkControllerTest {
         when(tedTalkService.findMostInfluentialTalksPerYear())
                 .thenReturn(List.of());
 
-        mockMvc.perform(get("/api/v1/ted-talks/influential-talks-per-year")
+        mockMvc.perform(get("/api/v1/ted-talks/talks/influential/yearly")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())

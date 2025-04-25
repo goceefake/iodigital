@@ -22,22 +22,24 @@ public interface TedTalkRepository extends JpaRepository<TedTalk, Long> {
 
     @Query(value = """
             SELECT * 
-            FROM TedTalk
+            FROM ted.ted_talk
             WHERE document @@ to_tsquery(:searchTerm)
                         """,
             nativeQuery = true)
-    Page<TedTalk> searchTedTalks(@Param("searchTerm") String search, Pageable pageable);
+    Page<TedTalk> searchTedTalks(@Param("searchTerm") String searchTerm, Pageable pageable);
 
-    @Query("""
+    @Query(value = """
             SELECT 
                 t.author AS author,
                 SUM(t.views) AS totalViews,
                 SUM(t.likes) AS totalLikes
-            FROM TedTalk AS t 
+            FROM ted.ted_talk AS t 
             GROUP BY t.author 
-            ORDER BY (SUM(t.views) * 0.7 + SUM(t.likes) * 0.3) DESC
-            """)
-    Page<InfluentialSpeaker> findInfluentialSpeakers(Pageable pageable);
+            ORDER BY (SUM(t.views) * :viewsWeight + SUM(t.likes) * :likesWeight) DESC
+            """, nativeQuery = true)
+    Page<InfluentialSpeaker> findInfluentialSpeakers(@Param("viewsWeight") float viewsWeight,
+                                                     @Param("likesWeight") double likesWeight,
+                                                     Pageable pageable);
 
     @Query(value = """
             WITH scored_talks AS (
@@ -47,7 +49,7 @@ public interface TedTalkRepository extends JpaRepository<TedTalk, Long> {
                     t.author AS author,
                     ROW_NUMBER() OVER (
                         PARTITION BY EXTRACT(YEAR FROM t.event_date)
-                        ORDER BY (t.views * 0.7 + t.likes * 0.3) DESC
+                        ORDER BY (t.views * :viewsWeight + t.likes * :likesWeight) DESC
                     ) AS rn
                 FROM ted.ted_talk AS t
             )
@@ -56,5 +58,6 @@ public interface TedTalkRepository extends JpaRepository<TedTalk, Long> {
             FROM scored_talks
             WHERE rn = 1 order by year desc
             """, nativeQuery = true)
-    List<InfluentialSpeakerPerYear> findMostInfluentialTalksPerYear();
+    List<InfluentialSpeakerPerYear> findMostInfluentialTalksPerYear(@Param("viewsWeight") float viewsWeight,
+                                                                    @Param("likesWeight") double likesWeight);
 }

@@ -1,6 +1,6 @@
 spring:
   application:
-    name: "assignment"
+    name: "csv-import-app"
   datasource:
     url: jdbc:postgresql://localhost:5432/tedtalks
     driver-class-name: org.postgresql.Driver

@@ -9,7 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -77,33 +77,40 @@ public class TedTalkController {
             )
     }
     )
-    @GetMapping(value = "/retrieve/{authorName}/speech")
-    public ResponseEntity<Page<TedTalkDto>> retrieveByAuthor(@PathVariable("authorName") String authorName, @PageableDefault(size = 20) Pageable pageable) {
+    @GetMapping("/authors/{authorName}")
+    public ResponseEntity<Page<TedTalkDto>> retrieveByAuthor(@PathVariable("authorName") @Valid
+                                                                 @NotEmpty
+                                                                 @Size(min = 2, max = 50)
+                                                                 String authorName,
+                                                             @PageableDefault(size = 20) Pageable pageable) {
         return ResponseEntity.status(HttpStatus.OK).body(tedTalkService.retrieveSpeechByAuthor(authorName, pageable));
     }
 
-//    @Operation(
-//            summary = "Fetch TedTalks REST API",
-//            description = "REST API to fetch Ted Talks based on the year"
-//    )
-//    @ApiResponses({
-//            @ApiResponse(
-//                    responseCode = "200",
-//                    description = "HTTP Status OK"
-//            ),
-//            @ApiResponse(
-//                    responseCode = "500",
-//                    description = "HTTP Status Internal Server Error",
-//                    content = @Content(
-//                            schema = @Schema(implementation = ErrorResponseDto.class)
-//                    )
-//            )
-//    }
-//    )
-//    @GetMapping(value = "/retrieve/{eventYear}/speech")
-//    public ResponseEntity<Page<TedTalkDto>> retrieveByYear(@PathVariable("eventYear") Integer eventYear, @PageableDefault(size = 20) Pageable pageable) {
-//        return ResponseEntity.status(HttpStatus.OK).body(tedTalkService.retrieveSpeechByYear(eventYear, pageable));
-//    }
+    @Operation(
+            summary = "Fetch TedTalks REST API",
+            description = "REST API to fetch Ted Talks based on the year"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "HTTP Status OK"
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "HTTP Status Internal Server Error",
+                    content = @Content(
+                            schema = @Schema(implementation = ErrorResponseDto.class)
+                    )
+            )
+    }
+    )
+    @GetMapping("/years/{eventYear}")
+    public ResponseEntity<Page<TedTalkDto>> retrieveByYear(@PathVariable("eventYear")
+                                                               @Valid @Pattern(regexp = "(^$|[0-9]{4})", message = "Year must be 4 digits")
+                                                               Integer eventYear,
+                                                           @PageableDefault(size = 20) Pageable pageable) {
+        return ResponseEntity.status(HttpStatus.OK).body(tedTalkService.retrieveSpeechByYear(eventYear, pageable));
+    }
 
     @Operation(
             summary = "Search TedTalks REST API",
@@ -123,8 +130,11 @@ public class TedTalkController {
             )
     }
     )
-    @GetMapping(value = "/search/{searchTerm}")
-    public ResponseEntity<Page<TedTalkDto>> searchTedTalks(@PathVariable("searchTerm") String searchTerm,
+    @GetMapping("/search/{searchTerm}")
+    public ResponseEntity<Page<TedTalkDto>> searchTedTalks(@PathVariable(value = "searchTerm")
+                                                           @NotBlank
+                                                           @Size(min = 2, max = 100)
+                                                           String searchTerm,
                                                            @PageableDefault(size = 20) Pageable pageable) {
         return ResponseEntity.status(HttpStatus.OK).body(tedTalkService.searchTedTalks(searchTerm, pageable));
     }
@@ -147,7 +157,7 @@ public class TedTalkController {
             )
     }
     )
-    @GetMapping("/influential-speakers")
+    @GetMapping("/speakers/influential")
     public ResponseEntity<Page<InfluentialSpeakerDto>> getInfluentialSpeakers(@PageableDefault(size = 20) Pageable pageable) {
         return ResponseEntity.ok(tedTalkService.findInfluentialSpeakers(pageable));
     }
@@ -170,7 +180,7 @@ public class TedTalkController {
             )
     }
     )
-    @GetMapping("/influential-talks-per-year")
+    @GetMapping("/talks/influential/yearly")
     public ResponseEntity<List<InfluentialSpeakerPerYearDto>> getMostInfluentialTalksPerYear() {
         return ResponseEntity.ok(tedTalkService.findMostInfluentialTalksPerYear());
     }

@@ -5,7 +5,6 @@ import com.tedtalks.assignment.dto.InfluentialSpeakerDto;
 import com.tedtalks.assignment.dto.InfluentialSpeakerPerYearDto;
 import com.tedtalks.assignment.dto.TedTalkDto;
 import com.tedtalks.assignment.entity.TedTalk;
-import com.tedtalks.assignment.entity.projection.InfluentialSpeakerPerYear;
 import com.tedtalks.assignment.mapper.TedTalkMapper;
 import com.tedtalks.assignment.repository.TedTalkRepository;
 import com.tedtalks.assignment.util.FileUtil;
@@ -15,7 +14,6 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -34,8 +32,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TedTalkService {
 
-    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("MMMM yyyy");
     private static final int BATCH_SIZE = 1000;
+    private static final float VIEWS_WEIGHT = 0.7f;
+    private static final float LIKES_WEIGHT = 0.3f;
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("MMMM yyyy");
+
 
     private final TedTalkRepository tedTalkRepository;
     private final TedTalkMapper tedTalkMapper;
@@ -100,12 +101,12 @@ public class TedTalkService {
     }
 
     public Page<InfluentialSpeakerDto> findInfluentialSpeakers(final Pageable pageable) {
-        return tedTalkRepository.findInfluentialSpeakers(pageable)
+        return tedTalkRepository.findInfluentialSpeakers(VIEWS_WEIGHT, LIKES_WEIGHT, pageable)
                 .map(tedTalkMapper::toInfluentialSpeakerDto);
     }
 
     public List<InfluentialSpeakerPerYearDto> findMostInfluentialTalksPerYear() {
-        return tedTalkRepository.findMostInfluentialTalksPerYear()
+        return tedTalkRepository.findMostInfluentialTalksPerYear(VIEWS_WEIGHT, LIKES_WEIGHT)
                 .stream()
                 .map(tedTalkMapper::toInfluentialSpeakerPerYearDto)
                 .toList();
