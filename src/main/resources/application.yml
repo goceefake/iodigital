@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: "assignment"
+  datasource:
+    url: jdbc:postgresql://localhost:5432/tedtalks
+    driver-class-name: org.postgresql.Driver
+    username: "root"
+    password: "root"
+  jpa:
+    properties:
+      hibernate:
+        generate_statistics: true
+
+logging:
+  level:
+    org:
+      hibernate:
+        stat: debug
+
+tedtalks:
+  max:
+    csv:
+      size: 20 * 1024 * 1024 # 20MB
