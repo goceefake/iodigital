@@ -10,14 +10,13 @@ spring:
     properties:
       hibernate:
         generate_statistics: true
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
 
 logging:
   level:
     org:
       hibernate:
         stat: debug
-
-tedtalks:
-  max:
-    csv:
-      size: 20 * 1024 * 1024 # 20MB

@@ -23,8 +23,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 
-import static com.tedtalks.assignment.util.FileUtil.validateCsvFile;
-
 @Tag(
         name = "CRUD REST APIs for TedTalks",
         description = "CRUD REST APIs in TedTalks to CREATE AND FETCH speeches by author and year and most influential speakers"
@@ -56,9 +54,6 @@ public class TedTalkController {
     )
     @PostMapping(value = "/import", consumes = "multipart/form-data")
     public ResponseEntity<FileImportResponse> importCsv(@RequestParam("file") @Valid @NotNull MultipartFile file) throws IOException {
-
-        validateCsvFile(file);
-
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(tedTalkService.importCsv(file));
@@ -87,28 +82,28 @@ public class TedTalkController {
         return ResponseEntity.status(HttpStatus.OK).body(tedTalkService.retrieveSpeechByAuthor(authorName, pageable));
     }
 
-    @Operation(
-            summary = "Fetch TedTalks REST API",
-            description = "REST API to fetch Ted Talks based on the year"
-    )
-    @ApiResponses({
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "HTTP Status OK"
-            ),
-            @ApiResponse(
-                    responseCode = "500",
-                    description = "HTTP Status Internal Server Error",
-                    content = @Content(
-                            schema = @Schema(implementation = ErrorResponseDto.class)
-                    )
-            )
-    }
-    )
-    @GetMapping(value = "/retrieve/{eventYear}/speech")
-    public ResponseEntity<Page<TedTalkDto>> retrieveByYear(@PathVariable("eventYear") Integer eventYear, @PageableDefault(size = 20) Pageable pageable) {
-        return ResponseEntity.status(HttpStatus.OK).body(tedTalkService.retrieveSpeechByYear(eventYear, pageable));
-    }
+//    @Operation(
+//            summary = "Fetch TedTalks REST API",
+//            description = "REST API to fetch Ted Talks based on the year"
+//    )
+//    @ApiResponses({
+//            @ApiResponse(
+//                    responseCode = "200",
+//                    description = "HTTP Status OK"
+//            ),
+//            @ApiResponse(
+//                    responseCode = "500",
+//                    description = "HTTP Status Internal Server Error",
+//                    content = @Content(
+//                            schema = @Schema(implementation = ErrorResponseDto.class)
+//                    )
+//            )
+//    }
+//    )
+//    @GetMapping(value = "/retrieve/{eventYear}/speech")
+//    public ResponseEntity<Page<TedTalkDto>> retrieveByYear(@PathVariable("eventYear") Integer eventYear, @PageableDefault(size = 20) Pageable pageable) {
+//        return ResponseEntity.status(HttpStatus.OK).body(tedTalkService.retrieveSpeechByYear(eventYear, pageable));
+//    }
 
     @Operation(
             summary = "Search TedTalks REST API",

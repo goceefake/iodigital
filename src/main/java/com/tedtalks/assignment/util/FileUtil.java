@@ -1,12 +1,8 @@
 package com.tedtalks.assignment.util;
 
-import com.tedtalks.assignment.exception.InvalidFileTypeException;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.csv.CSVRecord;
-import org.apache.coyote.BadRequestException;
-import org.apache.tomcat.util.http.fileupload.impl.FileSizeLimitExceededException;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
@@ -16,23 +12,6 @@ import java.util.Objects;
 @Slf4j
 @UtilityClass
 public class FileUtil {
-
-    private static final int MAX_FILE_SIZE = 20 * 1024 * 1024; // 20MB
-
-    public static boolean validateCsvFile(MultipartFile file) throws FileSizeLimitExceededException {
-
-        if (file.getSize() > MAX_FILE_SIZE) {
-            log.error("File is too large to be validated");
-            throw new FileSizeLimitExceededException("File size exceeds maximum limit of 20MB", file.getSize(), MAX_FILE_SIZE);
-        }
-
-        if (!"text/csv".equals(file.getContentType())) {
-            log.error("File is not a CSV file");
-            throw new InvalidFileTypeException("Invalid media type");
-        }
-
-        return true;
-    }
 
     public boolean verifyCsvRecord(final CSVRecord record, final DateTimeFormatter dateFormatter) {
         if (Objects.isNull(record)) {
